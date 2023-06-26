@@ -15,10 +15,10 @@ the /sys/module/block/parameters/no_part_scan file.
  1 file changed, 12 insertions(+)
 
 diff --git a/block/genhd.c b/block/genhd.c
-index 06b642b23a07..15769cadd687 100644
+index 1cb489b92..8dff9ee2c 100644
 --- a/block/genhd.c
 +++ b/block/genhd.c
-@@ -784,6 +784,15 @@ static void register_disk(struct device *parent, struct gendisk *disk,
+@@ -393,6 +393,15 @@ int disk_scan_partitions(struct gendisk *disk, fmode_t mode)
  	return ret;
  }
  
@@ -34,16 +34,15 @@ index 06b642b23a07..15769cadd687 100644
  /**
   * device_add_disk - add disk information to kernel list
   * @parent: parent device for the disk
-@@ -812,6 +821,9 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
+@@ -421,6 +430,9 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
  	 */
  	elevator_init_mq(disk->queue);
  
 +	if (disk_no_part_scan)
 +		disk->flags |= GENHD_FL_NO_PART;
 +
- 	/*
- 	 * If the driver provides an explicit major number it also must provide
- 	 * the number of minors numbers supported, and those will be used to
+ 	/* Mark bdev as having a submit_bio, if needed */
+ 	disk->part0->bd_has_submit_bio = disk->fops->submit_bio != NULL;
+ 
 -- 
-2.25.4
-
+2.41.0
